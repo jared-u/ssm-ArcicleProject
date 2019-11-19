@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+    <mapper namespace="cn.jared.mapper.ArticleMapper">
+        <resultMap type="cn.jared.pojo.Article" id="BaseMap">
+        	<id property="r_id" column="r_id" jdbcType="INTEGER"/>
+        	<result property="r_author" column="r_author" jdbcType="VARCHAR"/>
+        	<result property="r_summary" column="r_summary" jdbcType="VARCHAR"/>
+        	<result property="r_content" column="r_content" jdbcType="VARCHAR"/>
+        	<result property="r_date" column="r_date" jdbcType="VARCHAR"/>
+        	<result property="r_verify" column="r_verify" jdbcType="INTEGER"/>
+        	<result property="r_publish" column="r_publish" jdbcType="INTEGER"/>
+        	<result property="r_status" column="r_status" jdbcType="INTEGER"/>
+        </resultMap>
+        <resultMap type="cn.jared.pojo.Words" id="WordsBaseMap">
+        	<id property="lw_id" column="lw_id" jdbcType="INTEGER"/>
+        	<result property="lw_name" column="lw_name" jdbcType="VARCHAR"/>
+        	<result property="lw_date" column="lw_date" jdbcType="VARCHAR"/>
+        	<result property="lw_content" column="lw_content" jdbcType="VARCHAR"/>
+        	<result property="lw_for_name" column="lw_for_name" jdbcType="VARCHAR"/>
+        	<result property="lw_for_article_id" column="lw_for_article_id" jdbcType="VARCHAR"/>
+        </resultMap>
+        <resultMap type="cn.jared.pojo.Reply" id="ReplyBaseMap">
+        	<id property="lr_id" column="lr_id" jdbcType="INTEGER"/>
+        	<result property="lr_name" column="lr_name" jdbcType="VARCHAR"/>
+        	<result property="lr_date" column="lr_date" jdbcType="VARCHAR"/>
+        	<result property="lr_content" column="lr_content" jdbcType="VARCHAR"/>
+        	<result property="lr_for_name" column="lr_for_name" jdbcType="VARCHAR"/>
+        	<result property="lr_for_words" column="lr_for_words" jdbcType="VARCHAR"/>
+        	<result property="lr_for_reply" column="lr_for_reply" jdbcType="VARCHAR"/>
+        	<result property="lr_for_article_id" column="lr_for_article_id" jdbcType="VARCHAR"/>
+        </resultMap>
+        <insert id="saveArticle" parameterType="cn.jared.pojo.Article">
+        	insert into article(
+        		r_author,r_summary,r_content,r_date,r_verify,r_publish,r_status
+        	)
+        	values(#{r_author},#{r_summary},#{r_content},#{r_date},#{r_verify},#{r_publish},#{r_status})
+        </insert>
+        <!-- 查询r_status=0总记录数 -->
+        <select id="selectCount" resultType="int">
+        	select count(*) from article where r_status=0;
+        </select>
+        
+        <!-- 查询r_status=1总记录数 -->
+        <select id="selectCount2" resultType="int">
+        	select count(*) from article where r_status=1;
+        </select>
+        <!-- 分页查询 -->
+        <select id="findByPage" resultMap="BaseMap" parameterType="Map">
+        	select * from article
+        	<if test="goId==0">
+        		where r_status=0
+        	</if>
+        	<if test="goId==1">
+        		where r_status=1
+        	</if>
+        	<if	test="start!=null and size !=null">
+        		limit #{start},#{size}
+        	</if>
+        </select>
+        <select id="findConByPage" resultMap="BaseMap" parameterType="Map">
+        	select * from article
+        	<if test="goId==0">
+        		where r_status=0
+        	</if>
+        	<if test="goId==1">
+        		where r_status=1
+        	</if>
+        	<if test="r_verify != null and r_verify != ''">
+            and r_verify = #{r_verify}
+	        </if>
+	        <if test="r_publish != null and r_publish != ''">
+	            and r_publish = #{r_publish}
+	        </if>
+	        <if test="r_status != null and r_status != ''">
+	            and r_status = #{r_status}
+	        </if>
+        	<if	test="start!=null and size !=null">
+        		limit #{start},#{size}
+        	</if>
+        </select>
+        <!-- 查询所有留言信息 -->
+        <select id="findByWords" resultMap="WordsBaseMap">
+        	select * from words
+        </select>
+        <!-- 查询所有回复信息 -->
+        <select id="findByReply" resultMap="ReplyBaseMap">
+        	select * from reply
+        </select>
+        <!-- 通过id查询文章 -->
+        <select id="findById" parameterType="int" resultType="cn.jared.pojo.Article">
+        	select * from article where r_id=#{r_id}
+        </select>
+        <!-- 进入回收站 -->
+        <update id="delete" parameterType="int">
+        	update article set r_status=1 where r_id=#{r_id}
+        </update>
+        <!-- 恢复 -->
+        <update id="restore" parameterType="int">
+        	update article set r_status=0 where r_id=#{r_id}
+        </update>
+        <!-- 彻底删除 -->
+        <delete id="deletes" parameterType="int">
+        	delete from article where r_id=#{r_id}
+        </delete>
+        <!-- 更新 -->
+        <update id="update" parameterType="cn.jared.pojo.Article">
+	        update article set
+	          r_id        = #{r_id},
+	          r_author    = #{r_author},
+	          r_summary   = #{r_summary},
+	          r_content   = #{r_content},
+	          r_date      = #{r_date},
+	          r_verify    = #{r_verify},
+	          r_publish   = #{r_publish},
+	          r_status    = #{r_status}
+	        where r_id = #{r_id}
+    </update>
+    <!-- 保存 -->
+    <insert id="saveWords" parameterType="cn.jared.pojo.Words">
+        insert into words(
+          lw_name,
+          lw_date,
+          lw_content,
+          lw_for_name,
+          lw_for_article_id
+        )
+        values(
+          #{lw_name},
+          #{lw_date},
+          #{lw_content},
+          #{lw_for_name},
+          #{lw_for_article_id}
+        )
+    </insert>
+
+
+    <insert id="saveReply" parameterType="cn.jared.pojo.Reply">
+        insert into reply(
+          lr_name,
+          lr_date,
+          lr_content,
+          lr_for_name,
+          lr_for_words,
+          lr_for_reply,
+          lr_for_article_id
+        )
+        values(
+          #{lr_name},
+          #{lr_date},
+          #{lr_content},
+          #{lr_for_name},
+          #{lr_for_words},
+          #{lr_for_reply},
+          #{lr_for_article_id}
+        )
+    </insert>
+        
+    </mapper>
