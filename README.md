@@ -6,11 +6,11 @@
  
  ---
  #### 关于项目： 
- 、、、
+ ```
   环境：jdk1.8 + mysql5.7 + tomcat9 + eclipse    
   后端：spring + springmvc + mybatis  
   前端：layui + bootstrap + editor(Markdown富文本编辑器)  
   数据库名称：leave_message  
- 、、、
+ ```
  
  :mega:本项目原作者GitHub地址：[GitHub](https://github.com/TyCoding/ssm2)
